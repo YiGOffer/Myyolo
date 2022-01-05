@@ -45,7 +45,6 @@ class YoloBody(nn.Module):
         #   out_filters : [64, 128, 256, 512, 1024]
         #---------------------------------------------------#
         out_filters = self.backbone.layers_out_filters
-
         #------------------------------------------------------------------------#
         #   计算yolo_head的输出通道数，对于voc数据集而言
         #   final_out_filter0 = final_out_filter1 = final_out_filter2 = 75
