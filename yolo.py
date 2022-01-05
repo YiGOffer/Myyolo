@@ -16,6 +16,7 @@ from utils.utils_bbox import DecodeBox
 训练自己的数据集必看注释！
 '''
 class YOLO(object):
+    
     _defaults = {
         #--------------------------------------------------------------------------#
         #   使用自己训练好的模型进行预测一定要修改model_path和classes_path！
@@ -55,6 +56,7 @@ class YOLO(object):
         #   没有GPU可以设置成False
         #-------------------------------#
         "cuda"              : True,
+        
     }
 
     @classmethod
@@ -140,6 +142,7 @@ class YOLO(object):
                         image_shape, self.letterbox_image, conf_thres = self.confidence, nms_thres = self.nms_iou)
                                                     
             if results[0] is None: 
+                #***串口发送考虑位置！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！**#
                 return image
 
             top_label   = np.array(results[0][:, 6], dtype = 'int32')
@@ -182,7 +185,7 @@ class YOLO(object):
             draw.rectangle([tuple(text_origin), tuple(text_origin + label_size)], fill=self.colors[c])
             draw.text(text_origin, str(label,'UTF-8'), fill=(0, 0, 0), font=font)
             del draw
-
+        #********************串口发送考虑位置2！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！#
         return image
 
     def get_FPS(self, image, test_interval):
