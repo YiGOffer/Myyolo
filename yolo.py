@@ -26,8 +26,8 @@ class YOLO(object):
         #   验证集损失较低不代表mAP较高，仅代表该权值在验证集上泛化性能较好。
         #   如果出现shape不匹配，同时要注意训练时的model_path和classes_path参数的修改
         #--------------------------------------------------------------------------#
-        "model_path"        : 'model_data/yolo_weights.pth',
-        "classes_path"      : 'model_data/coco_classes.txt',
+        "model_path"        : 'logs/ep003-loss6.096-val_loss5.565.pth',
+        "classes_path"      : 'model_data/voc_classes.txt',
         #---------------------------------------------------------------------#
         #   anchors_path代表先验框对应的txt文件，一般不修改。
         #   anchors_mask用于帮助代码找到对应的先验框，一般不修改。
@@ -56,7 +56,6 @@ class YOLO(object):
         #   没有GPU可以设置成False
         #-------------------------------#
         "cuda"              : True,
-        
     }
 
     @classmethod
@@ -73,7 +72,7 @@ class YOLO(object):
         self.__dict__.update(self._defaults)
         for name, value in kwargs.items():
             setattr(self, name, value)
-            
+          
         #---------------------------------------------------#
         #   获得种类和先验框的数量
         #---------------------------------------------------#
@@ -105,11 +104,13 @@ class YOLO(object):
         if self.cuda:
             self.net = nn.DataParallel(self.net)
             self.net = self.net.cuda()
-
+    def getS(self):
+        return setUart
     #---------------------------------------------------#
     #   检测图片
     #---------------------------------------------------#
     def detect_image(self, image):
+        
         image_shape = np.array(np.shape(image)[0:2])
         #---------------------------------------------------------#
         #   在这里将图像转换成RGB图像，防止灰度图在预测时报错。
@@ -127,6 +128,7 @@ class YOLO(object):
         image_data  = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype='float32')), (2, 0, 1)), 0)
 
         with torch.no_grad():
+            global setUart
             images = torch.from_numpy(image_data)
             if self.cuda:
                 images = images.cuda()
@@ -141,8 +143,8 @@ class YOLO(object):
             results = self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, self.input_shape, 
                         image_shape, self.letterbox_image, conf_thres = self.confidence, nms_thres = self.nms_iou)
                                                     
-            if results[0] is None: 
-                #***串口发送考虑位置！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！**#
+            if results[0] is None:
+                setUart = 0 
                 return image
 
             top_label   = np.array(results[0][:, 6], dtype = 'int32')
@@ -185,7 +187,7 @@ class YOLO(object):
             draw.rectangle([tuple(text_origin), tuple(text_origin + label_size)], fill=self.colors[c])
             draw.text(text_origin, str(label,'UTF-8'), fill=(0, 0, 0), font=font)
             del draw
-        #********************串口发送考虑位置2！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！#
+            setUart = 1
         return image
 
     def get_FPS(self, image, test_interval):
@@ -238,6 +240,7 @@ class YOLO(object):
         tact_time = (t2 - t1) / test_interval
         return tact_time
 
+    
     def get_map_txt(self, image_id, image, class_names, map_out_path):
         f = open(os.path.join(map_out_path, "detection-results/"+image_id+".txt"),"w") 
         image_shape = np.array(np.shape(image)[0:2])
