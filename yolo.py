@@ -16,7 +16,6 @@ from utils.utils_bbox import DecodeBox
 训练自己的数据集必看注释！
 '''
 class YOLO(object):
-    
     _defaults = {
         #--------------------------------------------------------------------------#
         #   使用自己训练好的模型进行预测一定要修改model_path和classes_path！

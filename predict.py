@@ -9,8 +9,9 @@ import numpy as np
 from PIL import Image
 
 from yolo import YOLO
-#串口
+#------------------------串口----------------------------------#
 import serial
+#打开串口
 def open_ser():
     try:
         global ser
@@ -20,8 +21,33 @@ def open_ser():
     except Exception as exc:
         print("串口打开异常",exc)
     return ser
+
+#串口发送
+def send_msg(x):
+        try:
+            if   x == 1:
+                send_datas = bytes.fromhex('0001')
+            elif x == 0:
+                 send_datas = bytes.fromhex('0000')
+            else: print('参数输入0或1')
+
+            ser.write(send_datas)
+            print("已发送数据:",send_datas)
+        except Exception as exc:
+            print("发送异常", exc)
+#  # 接收数据
+# def read_msg(self):
+#     try:
+#         print("等待接收数据")
+#         while True:
+#             data = ser.read(ser.in_waiting).decode('gbk')
+#             if data != '':
+#                 break
+#         print("已接受到数据:",data)
+#     except Exception as exc:
+#         print("读取异常",exc)          
  # 关闭串口
-def close_ser(ser):
+def close_ser():
     try:
         ser.close()
         if ser.isOpen():
@@ -30,6 +56,7 @@ def close_ser(ser):
             print("串口已关闭")
     except Exception as exc:
                 print("串口关闭异常", exc)
+#------------------------串口----------------------------------#
 
 if __name__ == "__main__":
     yolo = YOLO()
@@ -50,8 +77,9 @@ if __name__ == "__main__":
     #   video_path、video_save_path和video_fps仅在mode='video'时有效
     #   保存视频时需要ctrl+c退出或者运行到最后一帧才会完成完整的保存步骤。
     #----------------------------------------------------------------------------------------------------------#
-    video_path      = "myVideoSave\origin\TESTroad.mp4"
-    video_save_path = "myVideoSave\Test2.mp4"
+    #video_path      = "myVideoSave\origin\TESTroad.mp4"
+    video_path      = 0
+    video_save_path = "myVideoSave\Test3.mp4"
     video_fps       = 10.0
     #-------------------------------------------------------------------------#
     #   test_interval用于指定测量fps的时候，图片检测的次数
@@ -71,7 +99,7 @@ if __name__ == "__main__":
     port = 'com1'  # 串口号
     baudrate = 115200  # 波特率
     timeout = 0
-    
+
     if mode == "predict":
         '''
         1、如果想要进行检测完的图片的保存，利用r_image.save("img.jpg")即可保存，直接在predict.py里进行修改即可。 
@@ -105,7 +133,7 @@ if __name__ == "__main__":
         #------------------------------------------------------------#
         #    串口打开
         #------------------------------------------------------------#
-        ser = open_ser()
+        open_ser()
         fps = 0.0
         while(True):
             t1 = time.time()
@@ -118,26 +146,32 @@ if __name__ == "__main__":
             # 转变成Image
             frame = Image.fromarray(np.uint8(frame))
             # 进行检测
-            frame = np.array(yolo.detect_image(frame,ser))
+            frame = np.array(yolo.detect_image(frame))
             # RGBtoBGR满足opencv显示格式
             frame = cv2.cvtColor(frame,cv2.COLOR_RGB2BGR)
-            
+            #串口发送检测结果#
+            send_datas = yolo.getS()
+            send_msg(send_datas)
+
             fps  = ( fps + (1./(time.time()-t1)) ) / 2
             print("fps= %.2f"%(fps))
             frame = cv2.putText(frame, "fps= %.2f"%(fps), (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
             
             cv2.imshow("video",frame)
-            c= cv2.waitKey(1) & 0xff 
+            c= cv2.waitKey(1) & 0xff
+            
+            
             if video_save_path!="":
                 out.write(frame)
 
             if c==27:
                 capture.release()
                 break
+            
         #------------------------------------------------------------#
         #    串口关闭
         #------------------------------------------------------------#
-        close_ser(ser)
+        close_ser()
         print("Video Detection Done!")
         capture.release()
         if video_save_path!="":
