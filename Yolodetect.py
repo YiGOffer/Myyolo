@@ -23,11 +23,12 @@ class Ui_Form(object):
         #-----------------------#
         # 视频参数设置
         #-----------------------#
-        self.video_path = 0
+        self.video_path = "myVideoSave\origin\TESTroad.mp4"
         self.video_save_path = "myVideoSave\TestF1.mp4"
         self.video_fps       = 25.0
         self.video_width     = 1280
         self.video_Heigth    = 960
+        
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(922, 720)
@@ -56,7 +57,6 @@ class Ui_Form(object):
         # self.timer_camera3.timeout.connect(self.show_camera2)
         # self.timer_camera4.timeout.connect(self.show_camera2)
         # self.timer_camera4.timeout.connect(self.show_camera3)
-        self.CAM_NUM = 0
         #按钮信号与槽的连接
         self.openBcarmera.clicked.connect(self.button_open_camera_click)
         self.startBdetect.clicked.connect(self.button_detect_camera_click)
@@ -73,7 +73,7 @@ class Ui_Form(object):
 
     def button_open_camera_click(self):
         if self.timer_camera1.isActive() == False:
-            flag = self.cap.open(self.CAM_NUM)
+            flag = self.cap.open(self.video_path)
             if flag == False:
                 msg = QtWidgets.QMessageBox.warning(self, u"Warning", u"请检测相机与电脑是否连接正确",
                                                     buttons=QtWidgets.QMessageBox.Ok,
@@ -115,12 +115,12 @@ class Ui_Form(object):
         #self.cap.set(cv2.CAP_PROP_FRAME_WIDTH,self.video_width)
         #self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT,self.video_Heigth)
         
-        width  = self.image.shape[0]
-        height = self.image.shape[1]
+        width  = self.cap.get(3)
+        height = self.cap.get(4)
 
         # 设置新的图片分辨率框架
-        width_new = 700
-        height_new = 500
+        width_new = 1280
+        height_new = 1000
 
         # 判断图片的长宽比率
         if width / height >= width_new / height_new:
@@ -140,6 +140,7 @@ class Ui_Form(object):
     
     def button_detect_camera_click(self):
         if self.timer_camera2.isActive() == False:
+            self.yolo = YOLO()
             self.timer_camera2.start(30)
             self.startBdetect.setText(u'停止检测')
         else:
@@ -147,11 +148,11 @@ class Ui_Form(object):
             self.timer_camera2.stop()
             self.startBdetect.setText(u'开始检测')
     def show_Detected_camera(self):
-        yolo = YOLO()
+
         # 转变成Image
         show = Image.fromarray(np.uint8(self.image))
         # 进行检测
-        show = np.array(yolo.detect_image(show))
+        show = np.array(self.yolo.detect_image(show))
         #BGR 转换为 RGB
         show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
         showImage = QtGui.QImage(show.data, show.shape[1], show.shape[0],3 * show.shape[1], QtGui.QImage.Format_RGB888)
