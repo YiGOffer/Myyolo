@@ -16,6 +16,7 @@ from utils.utils_bbox import DecodeBox
 训练自己的数据集必看注释！
 '''
 class YOLO(object):
+    
     _defaults = {
         #--------------------------------------------------------------------------#
         #   使用自己训练好的模型进行预测一定要修改model_path和classes_path！
@@ -25,8 +26,9 @@ class YOLO(object):
         #   验证集损失较低不代表mAP较高，仅代表该权值在验证集上泛化性能较好。
         #   如果出现shape不匹配，同时要注意训练时的model_path和classes_path参数的修改
         #--------------------------------------------------------------------------#
-        "model_path"        : 'logs/ep003-loss6.096-val_loss5.565.pth',
-        "classes_path"      : 'model_data/voc_classes.txt',
+        "model_path"        : 'logs\ep079-loss2.896-val_loss3.104.pth',
+        #"classes_path"      : 'model_data/voc_classes.txt',
+        "classes_path"      : '',
         #---------------------------------------------------------------------#
         #   anchors_path代表先验框对应的txt文件，一般不修改。
         #   anchors_mask用于帮助代码找到对应的先验框，一般不修改。
@@ -36,7 +38,7 @@ class YOLO(object):
         #---------------------------------------------------------------------#
         #   输入图片的大小，必须为32的倍数。
         #---------------------------------------------------------------------#
-        "input_shape"       : [416, 416],
+        "input_shape"       : [320, 320],
         #---------------------------------------------------------------------#
         #   只有得分大于置信度的预测框会被保留下来
         #---------------------------------------------------------------------#
@@ -67,7 +69,7 @@ class YOLO(object):
     #---------------------------------------------------#
     #   初始化YOLO
     #---------------------------------------------------#
-    def __init__(self, **kwargs):
+    def yoloinit(self, **kwargs):
         self.__dict__.update(self._defaults)
         for name, value in kwargs.items():
             setattr(self, name, value)
