@@ -191,7 +191,7 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "YoloV3训练检测平台"))
+        Form.setWindowTitle(_translate("Form", "YoloV3深度学习目标检测与通信平台"))
         self.label_left.setText(_translate("Form", "等待摄像头连接。。。"))
         self.label_right.setText(_translate("Form", "等待开始检测。。。"))
         self.groupBox.setTitle(_translate("Form", "检测操作区"))
