@@ -509,18 +509,10 @@ class Ui_Form(object):
     def send_msg(self,x):
             try:
                 if   x == 1:
-                    send_datas = struct.pack(">iiBB", # 大端存储 
-                    1,       # 数据1
-                    1,       # 数据1
-                    0x0D,         # 帧尾
-                    0x0A)         # 结束符 '\n = 0x0A
+                    send_datas=bytearray([0x01,0x0d,0x0a])
                     strsend = time.strftime("%Y-%m-%d %H:%M:%S")+"已发送数据：1"
                 elif x == 0:
-                    send_datas = struct.pack(">iiBB", # 大端存储 
-                    0,      # 数据1
-                    0,      # 数据1
-                    0x0D,         # 帧尾
-                    0x0A)         # 结束符 '\n = 0x0A
+                    send_datas=bytearray([0x00,0x0d,0x0a])
                     strsend = time.strftime("%Y-%m-%d %H:%M:%S")+"已发送数据：1"
                 else: print('参数输入0或1')
 
